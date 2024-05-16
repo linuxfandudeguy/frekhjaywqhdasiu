@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Coordinates Generator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title">Random Coordinates Around Your Area</h1>
+                <button class="btn btn-primary" onclick="generateRandomCoordinates()">Generate Random Coordinates</button>
+                <p class="mt-3" id="current-coordinates"></p>
+                <p id="random-coordinates"></p>
+                <div class="mt-3" id="map-frame"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getRandomOffset(maxOffset) {
+            return (Math.random() - 0.5) * maxOffset;
+        }
+
+        function generateRandomCoordinates() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    document.getElementById('current-coordinates').innerText = `Current Coordinates: Latitude ${latitude}, Longitude ${longitude}`;
+
+                    const maxOffset = 0.01; // ~1 km radius
+                    const randomLatitude = latitude + getRandomOffset(maxOffset);
+                    const randomLongitude = longitude + getRandomOffset(maxOffset);
+
+                    document.getElementById('random-coordinates').innerText = `Random Coordinates: Latitude ${randomLatitude.toFixed(6)}, Longitude ${randomLongitude.toFixed(6)}`;
+
+                    // Generate Google Maps iframe
+                    const mapFrame = document.getElementById('map-frame');
+                    const mapUrl = `https://www.google.com/maps?q=${randomLatitude},${randomLongitude}&z=15&output=embed`;
+                    mapFrame.innerHTML = `<iframe width="600" height="450" frameborder="0" style="border:0" src="${mapUrl}" allowfullscreen></iframe>`;
+                }, error => {
+                    alert('Geolocation error: ' + error.message);
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+    </script>
+</body>
+</html>
